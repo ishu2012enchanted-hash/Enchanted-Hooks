@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enchanted Hooks - Crochet Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #f5e6d3;
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+
+    <script>
+        const products = [
+            { 
+                id: 1, 
+                name: 'Mushroom Lip Balm Holder', 
+                price: 100, 
+                category: 'Accessories',
+                image: 'https://res.cloudinary.com/dxwoi9zos/image/upload/v1762785954/lip_balm_holder_x9xa3i.jpg',
+                description: 'Adorable mushroom-shaped lip balm holder in soft yarn'
+            },
+            { 
+                id: 2, 
+                name: 'Cute Humming Bear', 
+                price: 287, 
+                category: 'Decor',
+                image: 'https://res.cloudinary.com/dxwoi9zos/image/upload/v1762785952/bear_tjyx3d.jpg',
+                description: 'Charming crocheted bear companion - handmade with love'
+            },
+            { 
+                id: 3, 
+                name: 'Star Shaped Coffee Mat', 
+                price: 150, 
+                category: 'Home',
+                image: 'https://res.cloudinary.com/dxwoi9zos/image/upload/v1762785966/4_he8e37.png',
+                description: 'Beautiful star-shaped coaster for your warm beverages'
+            },
+            { 
+                id: 4, 
+                name: 'Laddu Gopal Simple Dress', 
+                price: 90, 
+                category: 'Clothing',
+                image: 'https://res.cloudinary.com/dxwoi9zos/image/upload/v1762785957/3_orwcge.png',
+                description: 'Traditional crochet dress for your deity idol'
+            },
+            { 
+                id: 5, 
+                name: 'Rainbow Lip Balm Holder', 
+                price: 100, 
+                category: 'Accessories',
+                image: 'https://res.cloudinary.com/dxwoi9zos/image/upload/v1762785956/2_odxgwa.png',
+                description: 'Colorful rainbow-themed lip balm holder'
+            },
+            { 
+                id: 6, 
+                name: 'Coffee Glove', 
+                price: 75, 
+                category: 'Accessories',
+                image: 'https://res.cloudinary.com/dxwoi9zos/image/upload/v1762785956/1_ynmuc7.png',
+                description: 'Cozy crochet sleeve for your coffee cups'
+            },
+            { 
+                id: 7, 
+                name: 'Cherry', 
+                price: 80, 
+                category: 'Decor',
+                image: 'https://res.cloudinary.com/dxwoi9zos/image/upload/v1762785952/cherrry_vwa91f.jpg',
+                description: 'Sweet cherry decoration with rope holder'
+            },
+        ];
+
+        const logoUrl = 'https://res.cloudinary.com/dxwoi9zos/image/upload/v1762785929/Logo_yoomhs.png';
+        const thumbnailUrl = 'https://res.cloudinary.com/dxwoi9zos/image/upload/v1762785929/Thumbnail_vnsfvs.png';
+
+        let cart = [];
+        let isCartOpen = false;
+
+        function renderPage() {
+            const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            document.getElementById('app').innerHTML = `
+                <div style="background-color: #f5e6d3; min-height: 100vh;">
+                    <!-- Header -->
+                    <header style="background-color: #c9825c; position: sticky; top: 0; z-index: 50; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);">
+                        <div style="max-width: 1280px; margin: 0 auto; padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <img src="${logoUrl}" alt="Logo" style="height: 48px; width: 48px; border-radius: 50%; object-fit: cover;">
+                                <div style="font-size: 1.875rem; font-weight: bold; color: #f5e6d3;">
+                                    Enchanted Hooks
+                                </div>
+                            </div>
+                            <button onclick="toggleCart()" style="background-color: #a0644e; color: white; padding: 0.5rem 1.5rem; border-radius: 0.5rem; border: none; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+                                🛒 <span>${cartCount}</span>
+                            </button>
+                        </div>
+                    </header>
+
+                    <!-- Hero Section -->
+                    <section style="max-width: 1280px; margin: 0 auto; padding: 2rem 1rem; text-align: center;">
+                        <img src="${thumbnailUrl}" alt="Thumbnail" style="margin: 0 auto 1.5rem; border-radius: 0.5rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); max-height: 200px; object-fit: contain;">
+                        <h2 style="font-size: 3rem; font-weight: bold; margin-bottom: 1rem; color: #8b5a3c;">Magic in Every Stitch</h2>
+                        <p style="font-size: 1.25rem; margin-bottom: 0.5rem; color: #a0644e;">Handcrafted crochet creations made with love and enchantment</p>
+                        <p style="font-size: 1.125rem; font-weight: 600; color: #c9825c;">✨ Each piece is made with love by Ishanvi's crochet hooks ✨</p>
+                    </section>
+
+                    <div style="display: flex; gap: 1.5rem; max-width: 1280px; margin: 0 auto; padding: 0 1rem; padding-bottom: 3rem;">
+                        <!-- Products Grid -->
+                        <main style="flex: 1;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                                ${products.map(product => `
+                                    <div style="border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); overflow: hidden; transition: transform 0.2s; background-color: #fff9f0;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                        <div style="height: 224px; display: flex; align-items: center; justify-content: center; background-color: #e8d4c0; overflow: hidden;">
+                                            <img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">
+                                        </div>
+                                        <div style="padding: 1.5rem;">
+                                            <span style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #c9825c;">${product.category}</span>
+                                            <h3 style="font-size: 1.125rem; font-weight: bold; margin-top: 0.5rem; margin-bottom: 0.5rem; color: #8b5a3c;">${product.name}</h3>
+                                            <p style="font-size: 0.875rem; margin-bottom: 0.75rem; color: #a0644e;">${product.description}</p>
+                                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                                <span style="font-size: 1.5rem; font-weight: bold; color: #c9825c;">₹${product.price}</span>
+                                                <button onclick="addToCart(${product.id})" style="background-color: #a0644e; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">Add</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </main>
+
+                        <!-- Shopping Cart Sidebar -->
+                        ${isCartOpen ? `
+                            <aside style="width: 320px; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); padding: 1.5rem; height: fit-content; position: sticky; top: 100px; background-color: #fff9f0;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                    <h2 style="font-size: 1.5rem; font-weight: bold; color: #8b5a3c;">Your Cart</h2>
+                                    <button onclick="toggleCart()" style="background: none; border: none; cursor: pointer; font-size: 1.5rem;">✕</button>
+                                </div>
+
+                                ${cart.length === 0 ? `
+                                    <p style="text-align: center; padding: 2rem 0; color: #a0644e;">Your cart is empty ✨</p>
+                                ` : `
+                                    <div style="max-height: 400px; overflow-y: auto; margin-bottom: 1.5rem; border-bottom: 1px solid #e8d4c0; padding-bottom: 1.5rem;">
+                                        ${cart.map(item => `
+                                            <div style="padding-bottom: 1rem; margin-bottom: 1rem;">
+                                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                                                    <div>
+                                                        <p style="font-weight: 600; color: #8b5a3c;">${item.name}</p>
+                                                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+                                                            <button onclick="updateQuantity(${item.id}, ${item.quantity - 1})" style="background-color: #e8d4c0; color: #8b5a3c; padding: 0.25rem 0.5rem; border-radius: 0.25rem; border: none; font-weight: 600; cursor: pointer;">−</button>
+                                                            <span style="padding: 0.25rem 0.75rem; color: #8b5a3c;">${item.quantity}</span>
+                                                            <button onclick="updateQuantity(${item.id}, ${item.quantity + 1})" style="background-color: #e8d4c0; color: #8b5a3c; padding: 0.25rem 0.5rem; border-radius: 0.25rem; border: none; font-weight: 600; cursor: pointer;">+</button>
+                                                        </div>
+                                                    </div>
+                                                    <button onclick="removeFromCart(${item.id})" style="color: #ef4444; background: none; border: none; cursor: pointer; font-weight: 600;">Remove</button>
+                                                </div>
+                                                <p style="font-weight: bold; color: #c9825c;">₹${item.price * item.quantity}</p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <div style="padding-top: 1rem;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                            <span style="font-size: 1.125rem; font-weight: bold; color: #8b5a3c;">Total:</span>
+                                            <span style="font-size: 1.5rem; font-weight: bold; color: #c9825c;">₹${cartTotal}</span>
+                                        </div>
+                                        <button style="width: 100%; background-color: #a0644e; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: bold; cursor: pointer;">Proceed to Checkout</button>
+                                        <p style="text-align: center; font-size: 0.875rem; margin-top: 0.75rem; font-weight: 600; color: #a0644e;">📞 +91 9901469152</p>
+                                    </div>
+                                `}
+                            </aside>
+                        ` : ''}
+                    </div>
+
+                    <!-- About Section -->
+                    <section style="background-color: #e8d4c0; padding: 4rem 1rem;">
+                        <div style="max-width: 768px; margin: 0 auto; text-align: center;">
+                            <h3 style="font-size: 1.875rem; font-weight: bold; margin-bottom: 1rem; color: #8b5a3c;">About Enchanted Hooks</h3>
+                            <p style="font-size: 1.125rem; color: #a0644e;">Welcome to Enchanted Hooks! I'm Ishanvi, a crochet artist passionate about creating handmade pieces that bring joy and magic into your life. Every stitch is infused with love and care, creating unique items that spark happiness. Whether it's a cozy coffee glove, a cute companion bear, or a decorative charm, each creation is enchanted with a touch of magic to make your everyday moments special. ✨</p>
+                        </div>
+                    </section>
+
+                    <!-- Footer -->
+                    <footer style="background-color: #8b5a3c; color: #f5e6d3; margin-top: 4rem; padding: 3rem 1rem; text-align: center;">
+                        <p style="margin-bottom: 1rem; font-size: 1.125rem; font-weight: 600;">Handcrafted with Touch of Enchantment ✨</p>
+                        <div style="margin-bottom: 1rem;">
+                            <p>📧 ishu2012enchanted@gmail.com</p>
+                            <p>📞 +91 9901469152</p>
+                        </div>
+                        <p style="font-size: 0.875rem; color: #e8d4c0;">© 2025 Enchanted Hooks by Ishanvi. All items made with care and love.</p>
+                    </footer>
+                </div>
+            `;
+        }
+
+        function toggleCart() {
+            isCartOpen = !isCartOpen;
+            renderPage();
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            const existingItem = cart.find(item => item.id === productId);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            renderPage();
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            renderPage();
+        }
+
+        function updateQuantity(productId, quantity) {
+            if (quantity <= 0) {
+                removeFromCart(productId);
+            } else {
+                const item = cart.find(i => i.id === productId);
+                if (item) item.quantity = quantity;
+                renderPage();
+            }
+        }
+
+        // Initial render
+        renderPage();
+    </script>
+</body>
+</html>
